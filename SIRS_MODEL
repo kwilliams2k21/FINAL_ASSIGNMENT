@@ -1,0 +1,240 @@
+import matplotlib.pyplot as plt
+import random
+
+my_data = []
+
+for i in range(100):
+    my_data.append(random.randint(1, 10))
+
+plt.plot(my_data)
+plt.show()
+
+import random
+
+
+class Population(object):
+
+    def __init__(self, num):
+        self.ID = num
+        self.x = 0
+        self.y = 0
+
+    def printLocation(self):
+        # Current Location of subject
+        print("Subject " + str(self.ID) + " is at the location (" + str(self.x) + "," + str(self.y) + ")")
+
+
+class Susceptible(Population):
+
+    def encounter(self):
+        # True = Human wins
+        chance = random.randint(1, 100)
+        if chance <= 40:
+            return False
+        return True
+
+    def move(self):
+        stepX = self.x + random.randint(-2, 2)
+        stepY = self.y + random.randint(-2, 2)
+        if (self.x + stepX < 1 or self.x + stepX > 10) == False:
+            self.x += stepX
+        if (self.y + stepY < 1 or self.y + stepY > 10) == False:
+            self.y += stepY
+
+    def immuneGenes(self):
+        research = random.randint(1, 100)
+        if research <= 10:
+            return True
+        return False
+
+    def animal(self):
+        # True = Human loses
+        odds = random.randint(1, 100)
+        if odds <= 5:
+            return True
+        return False
+
+
+class Infected(Population):
+
+    def move(self):
+        stepX = self.x + random.randint(-2, 2)
+        stepY = self.y + random.randint(-2, 2)
+        if (self.x + stepX < 1 or self.x + stepX > 10) == False:
+            self.x += stepX
+        if (self.y + stepY < 1 or self.y + stepY > 10) == False:
+            self.y += stepY
+
+    def healing(self):
+        # decides which zombies get cured
+        odds = random.randint(1, 100)
+        if odds <= 20:
+            return True
+        return False
+
+    def animal(self):
+        odds = random.randint(1, 100)
+        if odds <= 5:
+            return True
+        return False
+
+    def immuneGenes(self):
+        research = random.randint(1, 100)
+        if research <= 10:
+            return True
+        return False
+
+
+class Cured(Population):
+
+    def encounter(self):
+        # True = Human wins
+        chance = random.randint(1, 100)
+        if chance <= 40:
+            return False
+        return True
+
+    def move(self):
+        stepX = self.x + random.randint(-2, 2)
+        stepY = self.y + random.randint(-2, 2)
+        if (self.x + stepX < 1 or self.x + stepX > 10) == False:
+            self.x += stepX
+        if (self.y + stepY < 1 or self.y + stepY > 10) == False:
+            self.y += stepY
+
+        def immuneGenes(self):
+            research = random.randint(1, 100)
+            if research <= 10:
+                return True
+            return False
+
+        def animal(self):
+            odds = random.randint(1, 100)
+            if odds <= 5:
+                return True
+            return False
+
+
+class Resilient(Population):
+
+    def move(self):
+        stepX = self.x + random.randint(-2, 2)
+        stepY = self.y + random.randint(-2, 2)
+        if (self.x + stepX < 1 or self.x + stepX > 10) == False:
+            self.x += stepX
+        if (self.y + stepY < 1 or self.y + stepY > 10) == False:
+            self.y += stepY
+
+
+susRoll = random.randint(30, 50)
+susPop = 50
+inRoll = random.randint(1, 10)
+inPop = 4
+Pop = susPop + inPop
+
+deadPop = 0
+immunePop = 0
+
+surviving = []
+for a in range(susPop):
+    surviving_dummy = Susceptible(a + 1)
+    surviving.append(surviving_dummy)
+
+immune = []
+susCount = len(surviving) - 1
+while (susCount >= 0):
+    if surviving[susCount].immuneGenes() == True:
+        print("Subject " + str(susCount + 1) + " has become immune")
+        dummy = Resilient(susCount)
+        immune.append(dummy)
+        immunePop += 1
+        susPop -= 1
+        del surviving[susCount]
+    susCount -= 1
+
+susPop = len(surviving)
+
+zombie = []
+for z in range(inPop):
+    infected_dummy = Infected(z + 100 + 1)
+    zombie.append(infected_dummy)
+
+days = 1
+while (inPop > 0):
+    print("Day " + str(days) + " starts:")
+
+    susCount = len(surviving) - 1
+    while susCount >= 0:
+        surviving[susCount].move()
+        z = len(zombie) - 1
+        while z >= 0:
+            zombie[z].move()
+            if surviving[susCount].x == zombie[z].x and surviving[susCount].y == zombie[z].y:
+                print("ENCOUNTERED ZOMBIE!!!")
+                zombie[z].printLocation()
+                surviving[susCount].printLocation()
+                if not surviving[susCount].encounter():
+                    susPop -= 1
+                    dummy = Infected(surviving[susCount].ID)
+                    zombie.append(dummy)
+                    inPop += 1
+
+                    print("Subject " + str(surviving[susCount].ID) + " turned to a zombie")
+                    del surviving[susCount]
+                else:
+                    inPop -= 1
+                    deadPop += 1
+                    print("Subject " + str(zombie[z].ID) + " exterminated")
+                    del zombie[z]
+            z -= 1
+        susCount -= 1
+
+    susCount = len(surviving) - 1
+    while susCount >= 0:
+        if surviving[susCount].animal():
+            deadPop += 1
+            susPop -= 1
+            print("Subject " + str(surviving[susCount].ID) + " died to an animal")
+            del surviving[susCount]
+        susCount -= 1
+
+    z = len(zombie) - 1
+    while z >= 0:
+        if zombie[z].animal():
+            deadPop += 1
+            inPop -= 1
+            print("Subject " + str(zombie[z].ID) + " died to an animal")
+            del zombie[z]
+        z -= 1
+
+    c = len(zombie) - 1
+    while c >= 0:
+        if zombie[c].healing():
+            inPop -= 1
+
+            print("Subject " + str(zombie[c].ID) + " has been revived")
+            if zombie[c].immuneGenes():
+                immunePop += 1
+                dummy = Resilient(zombie[c].ID)
+                immune.append(dummy)
+                del zombie[c]
+                print("Subject " + str(zombie[c].ID) + " is also immune to the virus")
+            else:
+                susPop += 1
+                dummy = Susceptible(zombie[c].ID)
+                surviving.append(dummy)
+
+        c -= 1
+
+    print("End of Day " + str(days))
+    days += 1
+
+print("")
+print("ZOMBIE APOCALYPSE IS AT AN END!!!")
+print("Days: " + str(days - 1))
+print("Alive: " + str(susPop + immunePop))
+print("Became immune: " + str(immunePop))
+print("Did not survive: " + str(deadPop))
+print("Total: " + str(susPop + immunePop + deadPop))
+
+
